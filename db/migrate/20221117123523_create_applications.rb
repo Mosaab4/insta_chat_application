@@ -11,6 +11,7 @@ class CreateApplications < ActiveRecord::Migration[7.0]
     change_column_null :applications, :name, false
     change_column_null :applications, :token, false
 
-    add_index :applications, [:token,:name], unique: true
+    add_index :applications, [:token], unique: true
+    add_index :applications, [:name], unique: true
   end
 end

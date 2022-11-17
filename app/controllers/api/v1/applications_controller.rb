@@ -36,7 +36,7 @@ module Api
         if @application.valid?
           render json: @application, status: :created
         else
-          render json: { error: @application.errors }, status: :unprocessable_entity
+          render json: { error: @application.errors ,meta: { status: false } }, status: :unprocessable_entity
         end
       end
 
@@ -57,6 +57,7 @@ module Api
       # DELETE /applications/1
       def destroy
         @application.destroy
+        render json: { status: true, message: "Deleted Successfully"}
       end
 
       private
