@@ -46,6 +46,8 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
+    active_model_serializers (0.8.4)
+      activemodel (>= 3.0)
     activejob (7.0.4)
       activesupport (= 7.0.4)
       globalid (>= 0.3.6)
@@ -66,6 +68,7 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    api-pagination (5.0.0)
     bootsnap (1.13.0)
       msgpack (~> 1.2)
     builder (3.2.4)
@@ -148,12 +151,15 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    will_paginate (3.3.1)
     zeitwerk (2.6.6)
 
 PLATFORMS
   aarch64-linux
 
 DEPENDENCIES
+  active_model_serializers
+  api-pagination
   bootsnap
   debug
   faker
@@ -161,6 +167,7 @@ DEPENDENCIES
   puma (~> 5.0)
   rails (~> 7.0.4)
   tzinfo-data
+  will_paginate
 
 RUBY VERSION
    ruby 3.0.4p208
