@@ -2,12 +2,12 @@ Rails.application.routes.draw do
   namespace 'api' do
     namespace 'v1' do
       resources :applications do
-        resources :chats, :except =>[:update]
+        resources :chats, :except => [:update] do
+          resources :messages
+        end
       end
+
+      get 'applications/:application_id/chats/:chat_id/search', to: 'search#index'
     end
   end
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
 end
