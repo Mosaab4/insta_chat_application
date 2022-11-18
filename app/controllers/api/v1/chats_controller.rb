@@ -62,27 +62,24 @@ module Api
         end
 
         @chat.destroy
-        render json: { status: true, message: "Deleted Successfully"}
+        render json: { status: true, message: "Deleted Successfully" }
       end
 
       private
-        # Use callbacks to share common setup or constraints between actions.
-        def set_chat
-          if !@application.nil?
-            @chat = Chat.where(application: @application.id, chat_number: params[:id]).first
-          else
-            @chat = nil
-          end
 
+      # Use callbacks to share common setup or constraints between actions.
+      def set_chat
+        if !@application.nil?
+          @chat = Chat.where(application: @application.id, chat_number: params[:id]).first
+        else
+          @chat = nil
         end
+      end
 
-        def set_application
-          @application = Application.find_by(token: params[:application_id])
-        end
+      def set_application
+        @application = Application.find_by(token: params[:application_id])
+      end
 
-        def not_found_response
-          render json: { meta: { status: false, message: "Not Found" } }, status: :not_found
-        end
     end
   end
 end
