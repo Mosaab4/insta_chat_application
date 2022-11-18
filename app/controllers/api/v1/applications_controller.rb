@@ -43,7 +43,7 @@ module Api
         end
 
         if @application.update(name: params[:name])
-          success_response ApplicationRepresenter.new(@application).as_json, {}, :created
+          success_response ApplicationRepresenter.new(@application).as_json
           return
         end
 
