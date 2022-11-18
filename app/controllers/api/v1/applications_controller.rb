@@ -15,11 +15,6 @@ module Api
 
       # GET /applications/1
       def show
-        if @application.nil?
-          not_found_response
-          return
-        end
-
         success_response ApplicationRepresenter.new(@application).as_json
       end
 
@@ -37,6 +32,7 @@ module Api
           return
         end
 
+        error_response @application.errors.full_messages[0]
       end
 
       # PATCH/PUT /applications/1
@@ -65,6 +61,9 @@ module Api
       # Use callbacks to share common setup or constraints between actions.
       def set_application
         @application = Application.find_by(token: params[:id])
+        if @application.nil?
+          not_found_response
+        end
       end
     end
   end
