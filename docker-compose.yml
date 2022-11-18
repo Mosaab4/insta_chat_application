@@ -33,6 +33,19 @@ services:
     networks:
       - app-network
 
+  elasticsearch:
+    container_name: es-container
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    networks:
+      - app-network
+    ports:
+      - 9200:9200
+
   redis:
     image: redis
     volumes:
@@ -46,3 +59,4 @@ volumes:
   db_data:
   redis_data:
   bundle:
+  esdata1:
