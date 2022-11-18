@@ -7,57 +7,57 @@ module Api
       def index
         @applications = paginate Application.order('id DESC')
 
-        render json: @applications,
-               meta: {
-                 status: true, message: "Success",
-                 total_pages: @applications.total_pages,
-                 total_entries: @applications.total_entries
-               }
+        success_response ApplicationsRepresenter.new(@applications).as_json, {
+          total_pages: @applications.total_pages,
+          total_entries: @applications.total_entries
+        }
       end
 
       # GET /applications/1
       def show
         if @application.nil?
-          render json: { application: {}, meta: { status: false, message: "Not Found" } }, status: :not_found
-        else
-          render json: @application, meta: { status: true, message: "Success" }
+          not_found_response
+          return
         end
+
+        success_response ApplicationRepresenter.new(@application).as_json
       end
 
       # POST /applications
       def create
-        if params[:name] == ""
-          render json: { error: "Name can not be empty" }, status: :unprocessable_entity
+        if !params[:name] || params[:name] == ""
+          validation_error "name"
           return
         end
 
         @application = Application.create(name: params[:name], token: SecureRandom.uuid)
 
         if @application.valid?
-          render json: @application, status: :created
-        else
-          render json: { error: @application.errors ,meta: { status: false } }, status: :unprocessable_entity
+          success_response ApplicationRepresenter.new(@application).as_json, {}, :created
+          return
         end
+
       end
 
       # PATCH/PUT /applications/1
       def update
-        if params[:name] == ""
-          render json: { error: "Name can not be empty" }, status: :unprocessable_entity
+        if !params[:name] || params[:name] == ""
+          validation_error "name"
           return
         end
 
         if @application.update(name: params[:name])
-          render json: @application
-        else
-          render json: @application.errors, status: :unprocessable_entity
+          success_response ApplicationRepresenter.new(@application).as_json, {}, :created
+          return
         end
+
+        error_response @application.errors.full_messages[0]
       end
 
       # DELETE /applications/1
       def destroy
         @application.destroy
-        render json: { status: true, message: "Deleted Successfully"}
+        render json: { status: true, message: "Deleted Successfully" }
       end
 
       private
@@ -66,12 +66,6 @@ module Api
       def set_application
         @application = Application.find_by(token: params[:id])
       end
-
-      # Only allow a list of trusted parameters through.
-      def application_params
-        params.require(:application).permit(:name)
-      end
     end
-
   end
 end
