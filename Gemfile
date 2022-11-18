@@ -35,6 +35,9 @@ gem "active_model_serializers", require: true
 gem 'will_paginate'
 gem 'api-pagination'
 
+gem 'elasticsearch-model'
+
+
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
