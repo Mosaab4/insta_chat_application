@@ -6,8 +6,8 @@ class MessagesRepresenter
   def as_json
     @messages.map do |message|
       {
-        body: message.body,
-        message_number: message.message_number
+        body: message['body'],
+        message_number: message['message_number']
       }
     end
   end

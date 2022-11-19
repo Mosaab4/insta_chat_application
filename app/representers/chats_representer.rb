@@ -6,8 +6,8 @@ class ChatsRepresenter
   def as_json
     @chats.map do |chat|
       {
-        chat_number: chat.chat_number,
-        messages_count: chat.messages_count
+        chat_number: chat['chat_number'],
+        messages_count: chat['messages_count']
       }
     end
   end
