@@ -46,10 +46,25 @@ services:
     ports:
       - 9200:9200
 
+  sidekiq:
+    depends_on:
+      - 'db'
+      - 'redis'
+    build: .
+    command: bundle exec sidekiq
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - '.env'
+    networks:
+      - app-network
+
   redis:
     image: redis
     volumes:
       - redis_data:/data
+    networks:
+      - app-network
 
 networks:
   app-network:
