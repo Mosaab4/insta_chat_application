@@ -15,9 +15,11 @@ class Message < ApplicationRecord
         bool: {
           must: [
             {
-              multi_match: {
-                query: query,
-                fields: [:body]
+              query_string: {
+                "query": "*" + query + "*",
+                "fields": [
+                  "body"
+                ]
               }
             },
           ],
