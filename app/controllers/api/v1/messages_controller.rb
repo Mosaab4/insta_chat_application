@@ -1,9 +1,9 @@
 module Api
   module V1
     class MessagesController < ApplicationController
-      before_action :set_message, only: %i[ show update destroy ]
       before_action :set_application
       before_action :set_chat, only: %i[show destroy create index]
+      before_action :set_message, only: %i[ show update destroy]
 
       # GET /messages
       def index
@@ -23,11 +23,11 @@ module Api
           return
         end
 
-        message_number = @chat.messages.count
+        message_number = Message.where(chat_id: @chat.id).count
         @message = Message.create(body: params[:body], chat: @chat, message_number: message_number + 1)
 
         if @message.save
-          UpdateMessageChatsCountJob.perform_in(2.seconds, @chat.id)
+          UpdateChatMessagesCountJob.perform_in(2.seconds, @chat.id)
           success_response MessageRepresenter.new(@message).as_json
           return
         end
@@ -53,13 +53,14 @@ module Api
       # DELETE /messages/1
       def destroy
         @message.destroy
+        UpdateChatMessagesCountJob.perform_in(2.seconds, @chat.id)
         render json: { status: true, message: "Deleted Successfully" }
       end
 
       private
         # Use callbacks to share common setup or constraints between actions.
         def set_message
-          @message = Message.find(params[:id])
+          @message = !@chat.nil? ? Message.where(chat: @chat.id, message_number: params[:id]).first : nil
           if @message.nil?
             not_found_response
           end

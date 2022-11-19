@@ -1,4 +1,4 @@
-class UpdateMessageChatsCountJob
+class UpdateChatMessagesCountJob
   include Sidekiq::Job
 
   def perform(chat_id)
