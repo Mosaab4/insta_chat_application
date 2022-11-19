@@ -6,7 +6,17 @@ module Api
 
       # GET /chats
       def index
-        @chats = @application.chats
+        redis_key = Application.chats_redis_key(@application['token'])
+
+        chats = $redis.get(redis_key)
+
+        if chats.nil?
+          @chats = Chat.where(application_id: @application['id'])
+          $redis.set(redis_key, @chats.to_json)
+        else
+          @chats = JSON.load chats
+        end
+
         success_response ChatsRepresenter.new(@chats).as_json
       end
 
@@ -17,11 +27,18 @@ module Api
 
       # POST /chats
       def create
-        chats_count = Chat.where(application_id: @application.id).count
-        @chat = Chat.create(application: @application, chat_number: chats_count + 1)
+        chat_number = 0
+        last_chat_entry = Chat.where(application_id: @application['id']).order('id DESC').first
+
+        unless last_chat_entry.nil?
+          chat_number = last_chat_entry.chat_number
+        end
+
+        @chat = Chat.create(application_id: @application['id'], chat_number: chat_number + 1)
 
         if @chat.save
-          UpdateApplicationChatsCountJob.perform_in(2.seconds, @application.id)
+          $redis.del(Application.chats_redis_key(@application['token']))
+          UpdateApplicationChatsCountJob.perform_in(2.seconds, @application['id'])
           success_response ChatRepresenter.new(@chat).as_json, {}, :created
           return
         end
@@ -32,7 +49,8 @@ module Api
       # DELETE /chats/1
       def destroy
         @chat.destroy
-        UpdateApplicationChatsCountJob.perform_in(2.seconds, @application.id)
+        UpdateApplicationChatsCountJob.perform_in(2.seconds, @application['id'])
+        $redis.del(Application.chats_redis_key(@application['token']))
         render json: { status: true, message: "Deleted Successfully" }
       end
 
@@ -40,14 +58,24 @@ module Api
 
       # Use callbacks to share common setup or constraints between actions.
       def set_chat
-        @chat = !@application.nil? ? Chat.where(application: @application.id, chat_number: params[:id]).first : nil
+        @chat = !@application.nil? ? Chat.where(application_id: @application['id'], chat_number: params[:id]).first : nil
         if @chat.nil?
           not_found_response
         end
       end
 
       def set_application
-        @application = Application.find_by(token: params[:application_id])
+        token = params[:application_id]
+        redis_key = Application.redis_key(token)
+        application = $redis.get(redis_key)
+
+        if application.nil?
+          @application = Application.find_by(token: token)
+          $redis.set(redis_key, @application.to_json)
+        else
+          @application = JSON.load application
+        end
+
         if @application.nil?
           not_found_response
         end

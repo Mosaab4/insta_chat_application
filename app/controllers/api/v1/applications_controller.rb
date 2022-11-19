@@ -43,6 +43,8 @@ module Api
         end
 
         if @application.update(name: params[:name])
+          redis_key = Application.redis_key(@application.token)
+          $redis.set(redis_key, @application.to_json)
           success_response ApplicationRepresenter.new(@application).as_json
           return
         end
@@ -53,6 +55,7 @@ module Api
       # DELETE /applications/1
       def destroy
         @application.destroy
+        $redis.del(Application.redis_key(@application.token))
         render json: { status: true, message: "Deleted Successfully" }
       end
 
@@ -60,7 +63,17 @@ module Api
 
       # Use callbacks to share common setup or constraints between actions.
       def set_application
-        @application = Application.find_by(token: params[:id])
+        token = params[:id]
+        redis_key = Application.redis_key(token)
+        application = $redis.get(redis_key)
+
+        if application.nil? || request.delete? || request.put? || request.put?
+          @application = Application.find_by(token: token)
+          $redis.set(redis_key, @application.to_json)
+        else
+          @application = JSON.load application
+        end
+
         if @application.nil?
           not_found_response
         end
