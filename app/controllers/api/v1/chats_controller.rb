@@ -12,16 +12,16 @@ module Api
 
       # GET /chats/1
       def show
-        render json: @chat
+        success_response ChatRepresenter.new(@chat).as_json
       end
 
       # POST /chats
       def create
-        chats_count = @application.chats.count
-
+        chats_count = Chat.where(application_id: @application.id).count
         @chat = Chat.create(application: @application, chat_number: chats_count + 1)
 
         if @chat.valid?
+          UpdateApplicationChatsCountJob.perform_in(2.seconds, @application.id)
           success_response ChatRepresenter.new(@chat).as_json, {}, :created
           return
         end
