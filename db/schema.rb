@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_19_165807) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_20_053900) do
   create_table "applications", charset: "utf8mb4", force: :cascade do |t|
     t.string "name", null: false
     t.string "token", null: false
@@ -28,6 +28,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_19_165807) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["application_id"], name: "index_chats_on_application_id"
+    t.index ["chat_number", "application_id"], name: "index_chats_on_chat_number_and_application_id", unique: true
   end
 
   create_table "messages", charset: "utf8mb4", force: :cascade do |t|
@@ -37,6 +38,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_19_165807) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["chat_id"], name: "index_messages_on_chat_id"
+    t.index ["message_number", "chat_id"], name: "index_messages_on_message_number_and_chat_id", unique: true
   end
 
   add_foreign_key "chats", "applications", on_delete: :cascade
