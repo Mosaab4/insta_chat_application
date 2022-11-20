@@ -27,23 +27,9 @@ module Api
 
       # POST /chats
       def create
-        chat_number = 0
-        last_chat_entry = Chat.where(application_id: @application['id']).order('id DESC').first
-
-        unless last_chat_entry.nil?
-          chat_number = last_chat_entry.chat_number
-        end
-
-        @chat = Chat.create(application_id: @application['id'], chat_number: chat_number + 1)
-
-        if @chat.save
-          $redis.del(Application.chats_redis_key(@application['token']))
-          UpdateApplicationChatsCountJob.perform_in(2.seconds, @application['id'])
-          success_response ChatRepresenter.new(@chat).as_json, {}, :created
-          return
-        end
-
-        error_response @chat.errors.full_messages[0]
+        CreateChatJob.perform_async(@application['id'], @application['token'])
+        UpdateApplicationChatsCountJob.perform_in(2.seconds, @application['id'])
+        render json: { status: true, message: "Request Received" }
       end
 
       # DELETE /chats/1

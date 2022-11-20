@@ -7,7 +7,7 @@ module Api
 
       # GET /messages
       def index
-        redis_key = Chat.messages_redis_key(@chat['id'])
+        redis_key = Chat.messages_redis_key(@chat['chat_number'], @application['token'])
         messages = $redis.get(redis_key)
 
         if messages.nil?
@@ -32,24 +32,11 @@ module Api
           return
         end
 
-        message_number = 0
-        last_message_entry = Message.where(chat_id: @chat['id']).order('id DESC').first
+        CreateMessageJob.perform_async(@chat['id'], params[:body], @chat['chat_number'],@application['token'])
 
-        unless last_message_entry.nil?
-          message_number = last_message_entry.message_number
-        end
+        UpdateChatMessagesCountJob.perform_in(10.seconds, @chat['id'])
 
-        @message = Message.create(body: params[:body], chat_id: @chat['id'], message_number: message_number + 1)
-
-        if @message.save
-          UpdateChatMessagesCountJob.perform_in(2.seconds, @chat['id'])
-
-          $redis.del(Chat.messages_redis_key(@chat['id']))
-          success_response MessageRepresenter.new(@message).as_json
-          return
-        end
-
-        error_response @message.errors.full_messages[0]
+        render json: { status: true, message: "Request Received" }
       end
 
       # PATCH/PUT /messages/1
@@ -60,7 +47,7 @@ module Api
         end
 
         if @message.update(body: params[:body])
-          $redis.del(Chat.messages_redis_key(@chat['id']))
+          $redis.del(Chat.messages_redis_key(@chat['chat_number'],@application['token']))
           success_response MessageRepresenter.new(@message).as_json
           return
         end
@@ -71,7 +58,7 @@ module Api
       # DELETE /messages/1
       def destroy
         @message.destroy
-        $redis.del(Chat.messages_redis_key(@chat['id']))
+        $redis.del(Chat.messages_redis_key(@chat['chat_number'],@application['token']))
         UpdateChatMessagesCountJob.perform_in(2.seconds, @chat['id'])
         render json: { status: true, message: "Deleted Successfully" }
       end
@@ -87,7 +74,7 @@ module Api
 
         def set_chat
           chat_number = params[:chat_id]
-          redis_key = Chat.redis_key(chat_number)
+          redis_key = Chat.redis_key(chat_number, @application['token'])
           chat = $redis.get(redis_key)
 
           if chat.nil?
