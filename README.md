@@ -1,24 +1,29 @@
-# README
+# Ruby Task
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Getting Started
 
-Things you may want to cover:
+1. clone the repository
+2. ```docker-compose up -d```
 
-* Ruby version
+**Note** : Installation may take some time to pull docker images
 
-* System dependencies
+## Stack
 
-* Configuration
+The task is done using the following technologies
 
-* Database creation
+1. Rails (V7)
+2. Ruby (V3)
+3. Mysql
+4. Redis
+5. Elastic Search
+6. RabbitMQ
 
-* Database initialization
+## Ruby Gems
+Multiple Ruby Gems are used to complete the task:
+1. `elasticsearch-model`: integration between ActiveRecord and elastic search
+2. `sidekiq`: processing background jobs.
+3. `sneakers`: RabbitMQ background processing
+4. `bunny`: RabbitMQ client for ruby
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### API Documentation & Postman Collection
+You can view the documentation and run postman collection from [Here](https://documenter.getpostman.com/view/2179951/2s8YmUKzDv)
