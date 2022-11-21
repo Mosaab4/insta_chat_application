@@ -3,7 +3,7 @@ module Api
     class MessagesController < ApplicationController
       before_action :set_application
       before_action :set_chat
-      before_action :set_message, only: %i[ update destroy]
+      before_action :set_message, only: %i[create update destroy]
 
       # GET /messages
       def index
