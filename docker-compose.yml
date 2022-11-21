@@ -1,7 +1,8 @@
 services:
   web:
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails db:environment:set && bundle exec rails db:migrate:reset && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    container_name: web_app
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails db:environment:set && bundle exec rails db:migrate && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
       - .:/usr/src/app
       - bundle:/usr/local/bundle
@@ -13,7 +14,7 @@ services:
       - db
       - redis
     networks:
-      - app-network
+      - instabug_task
 
   db:
     image: mariadb:10.5.8
@@ -31,7 +32,7 @@ services:
       - db_data:/var/lib/mysql/
       - ./compose/mysql/my.cnf:/etc/mysql/my.cnf
     networks:
-      - app-network
+      - instabug_task
 
   elasticsearch:
     container_name: es-container
@@ -42,7 +43,7 @@ services:
     volumes:
       - esdata1:/usr/share/elasticsearch/data
     networks:
-      - app-network
+      - instabug_task
     ports:
       - 9200:9200
 
@@ -50,6 +51,7 @@ services:
     depends_on:
       - 'db'
       - 'redis'
+      - 'web'
     build: .
     command: bundle exec sidekiq
     volumes:
@@ -57,21 +59,40 @@ services:
     env_file:
       - '.env'
     networks:
-      - app-network
+      - instabug_task
 
   redis:
+    container_name: redis
     image: redis
     volumes:
       - redis_data:/data
     networks:
-      - app-network
+      - instabug_task
+
+  rabbitmq:
+    container_name: rabbitmq
+#    image: "rabbitmq:3.9-alpine"
+    image: rabbitmq:3-management-alpine
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq/
+      - rabbitmq:/var/log/rabbitmq
+    networks:
+      - instabug_task
 
 networks:
-  app-network:
+  instabug_task:
     driver: bridge
+    name: instabug_task
 
 volumes:
   db_data:
   redis_data:
   bundle:
+  rabbitmq:
   esdata1:
