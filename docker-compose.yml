@@ -13,6 +13,7 @@ services:
     depends_on:
       - db
       - redis
+      - elasticsearch
     networks:
       - instabug_task
 
@@ -49,10 +50,6 @@ services:
 
   sidekiq:
     container_name: insta_m_sidekiq
-    depends_on:
-      - 'db'
-      - 'redis'
-      - 'web'
     build: .
     command: bundle exec sidekiq
     volumes:
@@ -63,10 +60,6 @@ services:
       - instabug_task
 
   sneakers:
-    depends_on:
-      - 'rabbitmq'
-      - 'sidekiq'
-      - 'web'
     build: .
     command: rake sneakers:run
     volumes:
