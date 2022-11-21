@@ -77,7 +77,7 @@ module Api
           redis_key = Chat.redis_key(chat_number, @application['token'])
           chat = $redis.get(redis_key)
 
-          if chat.nil?
+          if chat.nil? || chat == "null"
             @chat = Chat.where(application: @application['id'], chat_number: params[:chat_id]).first
             $redis.set(redis_key, @chat.to_json)
           else
