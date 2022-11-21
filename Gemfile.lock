@@ -216,6 +216,8 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     will_paginate (3.3.1)
+    with_advisory_lock (4.6.0)
+      activerecord (>= 4.2)
     zeitwerk (2.6.6)
 
 PLATFORMS
@@ -236,6 +238,7 @@ DEPENDENCIES
   sneakers
   tzinfo-data
   will_paginate
+  with_advisory_lock
 
 RUBY VERSION
    ruby 3.0.4p208
