@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    container_name: web_app
+    container_name: insta_m_web
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails db:environment:set && bundle exec rails db:migrate && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
       - .:/usr/src/app
@@ -18,7 +18,7 @@ services:
 
   db:
     image: mariadb:10.5.8
-    container_name: ruby_db
+    container_name: insta_m_db
     restart: unless-stopped
     tty: true
     ports:
@@ -35,7 +35,7 @@ services:
       - instabug_task
 
   elasticsearch:
-    container_name: es-container
+    container_name: insta_m_elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
     environment:
       - xpack.security.enabled=false
@@ -48,6 +48,7 @@ services:
       - 9200:9200
 
   sidekiq:
+    container_name: insta_m_sidekiq
     depends_on:
       - 'db'
       - 'redis'
@@ -76,7 +77,7 @@ services:
       - instabug_task
 
   redis:
-    container_name: redis
+    container_name: insta_m_redis
     image: redis
     volumes:
       - redis_data:/data
@@ -84,7 +85,7 @@ services:
       - instabug_task
 
   rabbitmq:
-    container_name: rabbitmq
+    container_name: insta_m_rabbitmq
     image: "rabbitmq:3.9-alpine"
 #    image: rabbitmq:3-management-alpine
     depends_on:
