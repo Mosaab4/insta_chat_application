@@ -66,10 +66,14 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    amq-protocol (2.3.2)
     api-pagination (5.0.0)
     bootsnap (1.13.0)
       msgpack (~> 1.2)
     builder (3.2.4)
+    bunny (2.19.0)
+      amq-protocol (~> 2.3, >= 2.3.1)
+      sorted_set (~> 1, >= 1.0.2)
     concurrent-ruby (1.1.10)
     connection_pool (2.3.0)
     crass (1.0.6)
@@ -179,17 +183,31 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
+    rbtree (0.4.5)
     redis (4.8.0)
     redis-client (0.11.2)
       connection_pool
     reline (0.3.1)
       io-console (~> 0.5)
     ruby2_keywords (0.0.5)
+    serverengine (2.0.7)
+      sigdump (~> 0.2.2)
+    set (1.0.3)
     sidekiq (7.0.1)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
       redis-client (>= 0.9.0)
+    sigdump (0.2.4)
+    sneakers (2.11.0)
+      bunny (~> 2.12)
+      concurrent-ruby (~> 1.0)
+      rake
+      serverengine (~> 2.0.5)
+      thor
+    sorted_set (1.0.3)
+      rbtree
+      set (~> 1.0)
     thor (1.2.1)
     timeout (0.3.0)
     tzinfo (2.0.5)
@@ -206,6 +224,7 @@ PLATFORMS
 DEPENDENCIES
   api-pagination
   bootsnap
+  bunny
   debug
   elasticsearch-model
   faker
@@ -214,6 +233,7 @@ DEPENDENCIES
   rails (~> 7.0.4)
   redis (~> 4.0)
   sidekiq
+  sneakers
   tzinfo-data
   will_paginate
 
