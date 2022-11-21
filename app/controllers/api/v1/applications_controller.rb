@@ -1,7 +1,7 @@
 module Api
   module V1
     class ApplicationsController < ApplicationController
-      before_action :set_application, only: %i[ show update destroy ]
+      before_action :set_application, only: %i[ update destroy ]
 
       # GET /applications
       def index
@@ -11,11 +11,6 @@ module Api
           total_pages: @applications.total_pages,
           total_entries: @applications.total_entries
         }
-      end
-
-      # GET /applications/1
-      def show
-        success_response ApplicationRepresenter.new(@application).as_json
       end
 
       # POST /applications

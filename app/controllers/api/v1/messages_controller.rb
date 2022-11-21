@@ -2,8 +2,8 @@ module Api
   module V1
     class MessagesController < ApplicationController
       before_action :set_application
-      before_action :set_chat, only: %i[show destroy create index update]
-      before_action :set_message, only: %i[ show update destroy]
+      before_action :set_chat
+      before_action :set_message, only: %i[ update destroy]
 
       # GET /messages
       def index
@@ -18,11 +18,6 @@ module Api
         end
 
         success_response MessagesRepresenter.new(@messages).as_json
-      end
-
-      # GET /messages/1
-      def show
-        render json: @message
       end
 
       # POST /messages
@@ -84,9 +79,9 @@ module Api
             @chat = JSON.load chat
           end
 
-          if @chat.nil?
-            not_found_response
-          end
+          # if @chat.nil?
+          #   not_found_response
+          # end
         end
 
         def set_application
@@ -101,9 +96,9 @@ module Api
             @application = JSON.load application
           end
 
-          if @application.nil?
-            not_found_response
-          end
+          # if @application.nil?
+          #   not_found_response
+          # end
         end
     end
   end

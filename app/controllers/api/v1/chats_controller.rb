@@ -2,7 +2,7 @@ module Api
   module V1
     class ChatsController < ApplicationController
       before_action :set_application
-      before_action :set_chat, only: %i[show destroy]
+      before_action :set_chat, only: %i[destroy]
 
       # GET /chats
       def index
@@ -20,11 +20,6 @@ module Api
         success_response ChatsRepresenter.new(@chats).as_json
       end
 
-      # GET /chats/1
-      def show
-        success_response ChatRepresenter.new(@chat).as_json
-      end
-
       # POST /chats
       def create
         CreateChatJob.perform_async(@application['id'], @application['token'])
@@ -37,6 +32,8 @@ module Api
         @chat.destroy
         UpdateApplicationChatsCountJob.perform_in(2.seconds, @application['id'])
         $redis.del(Application.chats_redis_key(@application['token']))
+        $redis.del(Chat.redis_key(@chat['chat_number'], @application['token']))
+        $redis.del(Chat.messages_redis_key(@chat['chat_number'],@application['token']))
         render json: { status: true, message: "Deleted Successfully" }
       end
 
