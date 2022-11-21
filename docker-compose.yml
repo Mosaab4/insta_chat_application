@@ -61,6 +61,20 @@ services:
     networks:
       - instabug_task
 
+  sneakers:
+    depends_on:
+      - 'rabbitmq'
+      - 'sidekiq'
+      - 'web'
+    build: .
+    command: rake sneakers:run
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - '.env'
+    networks:
+      - instabug_task
+
   redis:
     container_name: redis
     image: redis
@@ -71,11 +85,13 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
-#    image: "rabbitmq:3.9-alpine"
-    image: rabbitmq:3-management-alpine
+    image: "rabbitmq:3.9-alpine"
+#    image: rabbitmq:3-management-alpine
+    depends_on:
+      - 'web'
     ports:
       - '5672:5672'
-      - '15672:15672'
+#      - '15672:15672'
     deploy:
       mode: replicated
       replicas: 1
